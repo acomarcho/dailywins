@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 type ErrorResponse = {
   message: string;
@@ -46,9 +47,8 @@ export default async function handler(
         user.password
       );
       if (isMatch) {
-        return res
-          .status(200)
-          .json({ message: "Succesfully logged in." });
+        const token = await jwt.sign(user, process.env.JWT_SECRET || "foo");
+        return res.status(200).json({ token });
       } else {
         return res.status(400).json({ message: "Invalid credentials." });
       }
