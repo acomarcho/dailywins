@@ -8,50 +8,50 @@ type ErrorResponse = {
   message: string;
 };
 
-type RegisterResponse = {
-  message: string;
+type LoginResponse = {
+  token: string;
 };
 
-const RegisterRequest = z.object({
-  name: z.string().nonempty(),
+const LoginRequest = z.object({
   email: z.string().nonempty(),
   password: z.string().nonempty(),
 });
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<RegisterResponse | ErrorResponse>
+  res: NextApiResponse<LoginResponse | ErrorResponse>
 ) {
   if (req.method === "POST") {
     try {
-      let registerRequest: z.infer<typeof RegisterRequest> = req.body;
+      let loginRequest: z.infer<typeof LoginRequest> = req.body;
       try {
-        RegisterRequest.parse(registerRequest);
+        LoginRequest.parse(loginRequest);
       } catch (err) {
-        return res.status(400).json({ message: "Incomplete fields." });
+        return res.status(400).json({ message: "Incomplete fields" });
       }
 
       const prisma = new PrismaClient();
 
       const user = await prisma.user.findUnique({
         where: {
-          email: registerRequest.email,
+          email: loginRequest.email,
         },
       });
-      if (user) {
-        return res.status(400).json({ message: "Email already taken." });
+      if (!user) {
+        return res.status(400).json({ message: "Invalid credentials." });
       }
 
-      const hashedPassword = await bcrypt.hash(registerRequest.password, 12);
-
-      await prisma.user.create({
-        data: {
-          ...registerRequest,
-          password: hashedPassword,
-        },
-      });
-
-      return res.status(200).json({ message: "Account successfully created." });
+      const isMatch = await bcrypt.compare(
+        loginRequest.password,
+        user.password
+      );
+      if (isMatch) {
+        return res
+          .status(200)
+          .json({ message: "Succesfully logged in." });
+      } else {
+        return res.status(400).json({ message: "Invalid credentials." });
+      }
     } catch (error) {
       return res.status(500).json({ message: "Internal server error." });
     }
