@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 type ErrorResponse = {
   message: string;
@@ -41,9 +42,12 @@ export default async function handler(
         return res.status(400).json({ message: "Email already taken" });
       }
 
+      const hashedPassword = await bcrypt.hash(registerRequest.password, 12);
+
       await prisma.user.create({
         data: {
           ...registerRequest,
+          password: hashedPassword,
         },
       });
 
