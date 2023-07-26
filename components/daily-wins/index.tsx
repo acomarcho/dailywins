@@ -9,15 +9,19 @@ import {
   UpdateDailyWinResponse,
 } from "@/lib/constants/responses";
 import { IconX, IconEdit } from "@tabler/icons-react";
+import { DateInput } from "@mantine/dates";
+import _ from "lodash";
 
 export default function DailyWins() {
   const { dailyWins, setDailyWins, isLoading, isError } = useDailyWins();
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isDateOpen, setIsDateOpen] = useState(false);
   const [content, setContent] = useState("");
   const [selectedId, setSelectedId] = useState(-1);
   const [isRequesting, setIsRequesting] = useState(false);
+  const [date, setDate] = useState<Date | null>(new Date());
 
   const loadingFlag = isLoading || isError || isRequesting;
 
@@ -28,6 +32,20 @@ export default function DailyWins() {
         <div className="absolute bottom-0 w-full h-[1rem] bg-primary" />
         <span className="relative">Your Daily Wins</span>
       </h1>
+      <p className="paragraph mt-[0.5rem]">
+        Showing results for{" "}
+        {new Intl.DateTimeFormat("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }).format(date!)}
+      </p>
+      <button
+        className="button mt-[0.5rem]"
+        onClick={() => setIsDateOpen(true)}
+      >
+        Change date
+      </button>
       <div className="mt-[1rem]">
         {dailyWins.length === 0 && (
           <p className="paragraph">
@@ -100,7 +118,19 @@ export default function DailyWins() {
                     "/api/daily-wins",
                     {
                       content,
-                      date: new Date().toISOString(),
+                      date: `${_.padStart(
+                        date!.getFullYear().toString(),
+                        4,
+                        "0"
+                      )}-${_.padStart(
+                        (date!.getMonth() + 1).toString(),
+                        2,
+                        "0"
+                      )}-${_.padStart(
+                        date!.getDate().toString(),
+                        2,
+                        "0"
+                      )}T00:00:00Z`,
                     },
                     {
                       headers: {
@@ -298,6 +328,22 @@ export default function DailyWins() {
               </button>
             </div>
           </form>
+        </div>
+      </Modal>
+      <Modal
+        opened={isDateOpen}
+        onClose={() => setIsDateOpen(false)}
+        withCloseButton={false}
+        centered={true}
+      >
+        <div
+          className="p-[1rem]"
+          style={{
+            height: "80vh",
+          }}
+        >
+          <h1 className="heading">Change date</h1>
+          <DateInput value={date} onChange={setDate} maxDate={new Date()} />
         </div>
       </Modal>
     </div>

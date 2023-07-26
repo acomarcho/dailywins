@@ -45,7 +45,12 @@ export default async function handler(
       });
 
       res.status(200).send({
-        data: dailyWins,
+        data: dailyWins.map((win) => {
+          return {
+            ...win,
+            date: win.date.toISOString(),
+          };
+        }),
       });
     } catch (error) {
       return res.status(500).json({ message: "Internal server error." });
@@ -62,6 +67,8 @@ export default async function handler(
     }
 
     let createDailyWinRequest: CreateDailyWinRequest = req.body;
+    console.log(createDailyWinRequest);
+
     try {
       CreateDailyWinSchema.parse(createDailyWinRequest);
     } catch (err) {
