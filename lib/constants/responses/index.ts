@@ -5,3 +5,4 @@ export type ErrorResponse = {
 export * from "./login";
 export * from "./register";
 export * from "./authenticate";
+export * from "./daily-wins";
