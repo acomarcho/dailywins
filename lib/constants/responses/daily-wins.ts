@@ -8,3 +8,7 @@ export type DailyWin = {
 export type GetDailyWinsResponse = {
   data: DailyWin[];
 };
+
+export type CreateDailyWinResponse = {
+  data: DailyWin;
+};

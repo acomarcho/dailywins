@@ -15,7 +15,7 @@ export default async function handler(
       try {
         RegisterSchema.parse(registerRequest);
       } catch (err) {
-        return res.status(400).json({ message: "Incomplete fields." });
+        return res.status(400).json({ message: "Incomplete or invalid fields." });
       }
 
       const prisma = new PrismaClient();
