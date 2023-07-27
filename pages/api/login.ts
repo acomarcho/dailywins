@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ErrorResponse, LoginResponse } from "@/lib/constants/responses";
-import { LoginRequest } from "@/lib/constants/requests";
+import { LoginSchema, LoginRequest } from "@/lib/constants/requests";
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,9 +13,9 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
-      let loginRequest: z.infer<typeof LoginRequest> = req.body;
+      let loginRequest: LoginRequest = req.body;
       try {
-        LoginRequest.parse(loginRequest);
+        LoginSchema.parse(loginRequest);
       } catch (err) {
         return res.status(400).json({ message: "Incomplete fields" });
       }

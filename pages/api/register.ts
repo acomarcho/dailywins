@@ -4,7 +4,7 @@ import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { ErrorResponse, RegisterResponse } from "@/lib/constants/responses";
-import { RegisterRequest } from "@/lib/constants/requests";
+import { RegisterSchema, RegisterRequest } from "@/lib/constants/requests";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,9 +12,9 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
-      let registerRequest: z.infer<typeof RegisterRequest> = req.body;
+      let registerRequest: RegisterRequest = req.body;
       try {
-        RegisterRequest.parse(registerRequest);
+        RegisterSchema.parse(registerRequest);
       } catch (err) {
         return res.status(400).json({ message: "Incomplete fields." });
       }
