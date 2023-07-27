@@ -12,3 +12,7 @@ export type GetDailyWinsResponse = {
 export type CreateDailyWinResponse = {
   data: DailyWin;
 };
+
+export type UpdateDailyWinResponse = {
+  data: DailyWin;
+};

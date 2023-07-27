@@ -6,3 +6,11 @@ export const CreateDailyWinSchema = z.object({
 });
 
 export type CreateDailyWinRequest = z.infer<typeof CreateDailyWinSchema>;
+
+export const UpdateDailyWinSchema = z.object({
+  id: z.number(),
+  content: z.string().nonempty(),
+  delete: z.boolean(),
+});
+
+export type UpdateDailyWinRequest = z.infer<typeof UpdateDailyWinSchema>;
