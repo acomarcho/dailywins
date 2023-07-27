@@ -26,7 +26,7 @@ export default function Login() {
   const loadingFlag = isLoading;
 
   return (
-    <div className="wrapper">
+    <div className="wrapper min-h-[calc(100vh-4rem)]">
       <LoadingOverlay visible={loadingFlag} overlayBlur={2} />
       <h1 className="heading relative inline-block">
         <div className="absolute bottom-0 w-full h-[1rem] bg-primary" />

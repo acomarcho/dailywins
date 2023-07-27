@@ -5,7 +5,7 @@ export default function Home() {
   const { user } = useUser();
 
   return (
-    <div className="wrapper">
+    <div className="wrapper min-h-[calc(100vh-4rem)]">
       <div className="flex flex-col gap-[2rem] lg:flex-row">
         <div className="lg:w-[50%]">
           <h1 className="heading">DailyWins</h1>

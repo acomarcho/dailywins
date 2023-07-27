@@ -14,6 +14,7 @@ export default function DailyWins() {
   const { dailyWins, setDailyWins, isLoading, isError } = useDailyWins();
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [content, setContent] = useState("");
   const [selectedId, setSelectedId] = useState(-1);
   const [isRequesting, setIsRequesting] = useState(false);
@@ -21,7 +22,7 @@ export default function DailyWins() {
   const loadingFlag = isLoading || isError || isRequesting;
 
   return (
-    <div className="wrapper">
+    <div className="wrapper min-h-[calc(100vh-4rem)]">
       <LoadingOverlay visible={loadingFlag} overlayBlur={2} />
       <h1 className="heading relative inline-block">
         <div className="absolute bottom-0 w-full h-[1rem] bg-primary" />
@@ -53,7 +54,13 @@ export default function DailyWins() {
                         />
                       </button>
                       <button>
-                        <IconEdit />
+                        <IconEdit
+                          onClick={() => {
+                            setIsUpdating(true);
+                            setContent(win.content);
+                            setSelectedId(win.id);
+                          }}
+                        />
                       </button>
                     </div>
                   </div>
@@ -208,6 +215,89 @@ export default function DailyWins() {
           >
             Yes, proceed
           </button>
+        </div>
+      </Modal>
+      <Modal
+        opened={isUpdating}
+        onClose={() => setIsUpdating(false)}
+        withCloseButton={false}
+        centered={true}
+      >
+        <div className="p-[1rem]">
+          <h1 className="heading">Update win</h1>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+
+              const request = async () => {
+                try {
+                  setIsRequesting(true);
+                  const { data } = await axios.put<UpdateDailyWinResponse>(
+                    "/api/daily-wins",
+                    {
+                      id: selectedId,
+                      content: content,
+                      delete: false,
+                    },
+                    {
+                      headers: {
+                        Authorization:
+                          localStorage.getItem("token") &&
+                          `Bearer ${localStorage.getItem("token")}`,
+                      },
+                    }
+                  );
+                  setDailyWins(
+                    dailyWins.map((win) => {
+                      if (win.id === data.data.id) {
+                        return { ...win, content: data.data.content };
+                      } else {
+                        return win;
+                      }
+                    })
+                  );
+                  setIsUpdating(false);
+                  notifications.show({
+                    message: "Successfully updated win!",
+                    withCloseButton: false,
+                    color: "teal",
+                  });
+                } catch (error) {
+                  notifications.show({
+                    message: "Failed to update win!",
+                    withCloseButton: false,
+                    color: "red",
+                  });
+                } finally {
+                  setIsRequesting(false);
+                }
+              };
+
+              request();
+            }}
+            className="mt-[1rem]"
+          >
+            <div className="flex flex-col gap-[0.25rem]">
+              <label htmlFor="content" className="paragraph font-bold">
+                Content <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="content"
+                className="paragraph bg-white px-[1rem] py-[0.5rem] drop-shadow-lg"
+                placeholder="I jogged for 30 minutes today!"
+                value={content}
+                onChange={(e) => {
+                  setContent(e.currentTarget.value);
+                }}
+              />
+            </div>
+            <div className="mt-[2rem]">
+              <button type="submit" className="button" disabled={!content}>
+                Add win
+              </button>
+            </div>
+          </form>
         </div>
       </Modal>
     </div>
