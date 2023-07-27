@@ -4,6 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { notifications } from "@mantine/notifications";
 import { LoadingOverlay } from "@mantine/core";
+import { useRouter } from "next/router";
 import Link from "next/link";
 
 export default function Login() {
@@ -24,6 +25,8 @@ export default function Login() {
   };
 
   const loadingFlag = isLoading;
+
+  const router = useRouter();
 
   return (
     <div className="wrapper min-h-[calc(100vh-4rem)]">
@@ -51,6 +54,7 @@ export default function Login() {
                 message: "Welcome back to Daily Wins!",
                 color: "teal",
               });
+              router.push('/daily-wins')
             } catch (error) {
               if (axios.isAxiosError(error)) {
                 notifications.show({
