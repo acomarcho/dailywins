@@ -7,10 +7,16 @@ module.exports = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      fontFamily: {
+        heading: ['var(--font-raleway)'],
+        paragraph: ['var(--font-lato)'],
+      },
+      colors: {
+        background: '#ffffff',
+        header: '#f5f5f5',
+        maincontent: '#f0ede5',
+        primary: '#c4beb6',
+        text: '#333333',
       },
     },
   },
