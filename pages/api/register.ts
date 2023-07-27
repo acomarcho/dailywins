@@ -3,20 +3,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-
-type ErrorResponse = {
-  message: string;
-};
-
-type RegisterResponse = {
-  message: string;
-};
-
-const RegisterRequest = z.object({
-  name: z.string().nonempty(),
-  email: z.string().nonempty(),
-  password: z.string().nonempty(),
-});
+import { ErrorResponse, RegisterResponse } from "@/lib/constants/responses";
+import { RegisterRequest } from "@/lib/constants/requests";
 
 export default async function handler(
   req: NextApiRequest,

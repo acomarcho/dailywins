@@ -4,19 +4,8 @@ import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
-type ErrorResponse = {
-  message: string;
-};
-
-type LoginResponse = {
-  token: string;
-};
-
-const LoginRequest = z.object({
-  email: z.string().nonempty(),
-  password: z.string().nonempty(),
-});
+import { ErrorResponse, LoginResponse } from "@/lib/constants/responses";
+import { LoginRequest } from "@/lib/constants/requests";
 
 export default async function handler(
   req: NextApiRequest,
