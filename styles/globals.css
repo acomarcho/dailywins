@@ -21,6 +21,6 @@
     font-family: var(--font-lato);
   }
   .button {
-    @apply bg-primary px-[1rem] py-[0.5rem] text-[1rem] lg:text-[1.5rem] text-text font-bold transition-all hover:bg-primary-400 disabled:bg-primary-200;
+    @apply bg-primary px-[1rem] py-[0.5rem] text-[1rem] lg:text-[1.5rem] text-text font-bold transition-all hover:bg-primary-400 disabled:bg-primary-200 drop-shadow-lg;
   }
 }

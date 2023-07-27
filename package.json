@@ -24,6 +24,7 @@
     "bcrypt": "^5.1.0",
     "eslint": "8.45.0",
     "eslint-config-next": "13.4.12",
+    "jotai": "^2.2.2",
     "jsonwebtoken": "^9.0.1",
     "next": "13.4.12",
     "postcss": "8.4.27",
