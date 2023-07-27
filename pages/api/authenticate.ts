@@ -10,12 +10,12 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       if (!req.headers.authorization) {
-        return res.status(401).end();
+        return res.status(401).json({ message: "Invalid token" });
       }
 
       const user = await getUserFromAuthHeader(req.headers.authorization);
       if (!user.email) {
-        return res.status(401).end();
+        return res.status(401).json({ message: "Invalid token" });
       }
 
       return res.status(200).json({
@@ -27,6 +27,6 @@ export default async function handler(
       return res.status(500).json({ message: "Internal server error." });
     }
   } else {
-    return res.status(405).end();
+    return res.status(405).json({ message: "Method not allowed" });
   }
 }

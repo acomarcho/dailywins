@@ -27,13 +27,13 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       if (!req.headers.authorization) {
-        return res.status(401).end();
+        return res.status(401).json({ message: "Invalid token" });
       }
 
       const user = await getUserFromAuthHeader(req.headers.authorization);
 
       if (!user.email) {
-        return res.status(401).end();
+        return res.status(401).json({ message: "Invalid token" });
       }
 
       const prisma = new PrismaClient();
@@ -66,13 +66,13 @@ export default async function handler(
     }
   } else if (req.method === "POST") {
     if (!req.headers.authorization) {
-      return res.status(401).end();
+      return res.status(401).json({ message: "Invalid token" });
     }
 
     const user = await getUserFromAuthHeader(req.headers.authorization);
 
     if (!user.email) {
-      return res.status(401).end();
+      return res.status(401).json({ message: "Invalid token" });
     }
 
     let createDailyWinRequest: CreateDailyWinRequest = req.body;
@@ -108,13 +108,13 @@ export default async function handler(
   } else if (req.method === "PUT") {
     try {
       if (!req.headers.authorization) {
-        return res.status(401).end();
+        return res.status(401).json({ message: "Invalid token" });
       }
 
       const user = await getUserFromAuthHeader(req.headers.authorization);
 
       if (!user.email) {
-        return res.status(401).end();
+        return res.status(401).json({ message: "Invalid token" });
       }
 
       let updateRequest: UpdateDailyWinRequest = req.body;
@@ -140,7 +140,7 @@ export default async function handler(
         }
 
         if (dailyWin.userId !== user.id) {
-          return res.status(403).end();
+          return res.status(403).json({ message: "Unauthorized" });
         }
       } catch (err) {
         return res.status(404).json({ message: "ID not found" });
