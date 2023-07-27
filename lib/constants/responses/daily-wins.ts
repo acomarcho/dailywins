@@ -2,7 +2,7 @@ export type DailyWin = {
   id: number;
   userId: number;
   content: string;
-  date: Date;
+  date: string;
 };
 
 export type GetDailyWinsResponse = {

@@ -44,7 +44,7 @@ export default async function handler(
         },
       });
 
-      res.status(400).send({
+      res.status(200).send({
         data: dailyWins,
       });
     } catch (error) {
