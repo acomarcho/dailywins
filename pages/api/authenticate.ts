@@ -19,6 +19,7 @@ export default async function handler(
       }
 
       return res.status(200).json({
+        id: user.id,
         name: user.name,
         email: user.email,
       });

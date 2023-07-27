@@ -35,7 +35,14 @@ export default async function handler(
         user.password
       );
       if (isMatch) {
-        const token = await jwt.sign(user, process.env.JWT_SECRET || "foo");
+        const token = await jwt.sign(
+          {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          },
+          process.env.JWT_SECRET || "foo"
+        );
         return res.status(200).json({ token });
       } else {
         return res.status(400).json({ message: "Invalid credentials." });

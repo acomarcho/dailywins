@@ -3,12 +3,14 @@ import jwt from "jsonwebtoken";
 import { parseToken } from "@/lib/utils";
 
 type User = {
+  id: number;
   name: string;
   email: string;
 };
 
 export const getUserFromAuthHeader = async (authHeader: string) => {
   const noUser: User = {
+    id: -1,
     name: "",
     email: "",
   };
@@ -37,7 +39,11 @@ export const getUserFromAuthHeader = async (authHeader: string) => {
     if (!user) {
       return noUser;
     }
-    return user;
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
   } catch {
     return noUser;
   }

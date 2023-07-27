@@ -24,12 +24,14 @@ export const useUserWithFetch = () => {
           }
         );
         setUser({
+          id: data.id,
           name: data.name,
           email: data.email,
         });
       } catch (error) {
         setIsError(true);
         setUser({
+          id: -1,
           name: "",
           email: "",
         });
