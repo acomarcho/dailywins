@@ -4,12 +4,18 @@ import { useDailyWins } from "@/lib/hooks/useDailyWins";
 import { Modal } from "@mantine/core";
 import axios from "axios";
 import { notifications } from "@mantine/notifications";
-import { CreateDailyWinResponse } from "@/lib/constants/responses";
+import {
+  CreateDailyWinResponse,
+  UpdateDailyWinResponse,
+} from "@/lib/constants/responses";
+import { IconX, IconEdit } from "@tabler/icons-react";
 
 export default function DailyWins() {
   const { dailyWins, setDailyWins, isLoading, isError } = useDailyWins();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [content, setContent] = useState("");
+  const [selectedId, setSelectedId] = useState(-1);
   const [isRequesting, setIsRequesting] = useState(false);
 
   const loadingFlag = isLoading || isError || isRequesting;
@@ -35,18 +41,33 @@ export default function DailyWins() {
                   key={win.id}
                   className="bg-maincontent p-[1rem] drop-shadow-md"
                 >
-                  <p className="paragraph">{win.content}</p>
+                  <div className="flex w-full justify-between items-center">
+                    <p className="paragraph max-w-[60%]">{win.content}</p>
+                    <div className="flex gap-[1rem]">
+                      <button>
+                        <IconX
+                          onClick={() => {
+                            setIsDeleting(true);
+                            setSelectedId(win.id);
+                          }}
+                        />
+                      </button>
+                      <button>
+                        <IconEdit />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
       </div>
-      <div className="mt-[1rem]">
+      <div className="mt-[2rem]">
         <button
           className="button"
           onClick={() => {
-            setIsModalOpen(true);
+            setIsCreating(true);
             setContent("");
           }}
         >
@@ -54,8 +75,8 @@ export default function DailyWins() {
         </button>
       </div>
       <Modal
-        opened={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        opened={isCreating}
+        onClose={() => setIsCreating(false)}
         withCloseButton={false}
         centered={true}
       >
@@ -83,7 +104,7 @@ export default function DailyWins() {
                     }
                   );
                   setDailyWins([...dailyWins, data.data]);
-                  setIsModalOpen(false);
+                  setIsCreating(false);
                   notifications.show({
                     message: "Successfully added daily win!",
                     withCloseButton: false,
@@ -125,6 +146,68 @@ export default function DailyWins() {
               </button>
             </div>
           </form>
+        </div>
+      </Modal>
+      <Modal
+        opened={isDeleting}
+        onClose={() => setIsDeleting(false)}
+        withCloseButton={false}
+        centered={true}
+      >
+        <div className="p-[1rem]">
+          <h1 className="heading">Delete win</h1>
+          <p className="paragraph mt-[0.5rem]">
+            Are you sure to delete the win with content{" "}
+            {`"${dailyWins.find((win) => win.id === selectedId)?.content}"?`}
+          </p>
+          <button
+            className="button mt-[2rem]"
+            onClick={() => {
+              const request = async () => {
+                try {
+                  setIsRequesting(true);
+                  const { data } = await axios.put<UpdateDailyWinResponse>(
+                    "/api/daily-wins",
+                    {
+                      id: selectedId,
+                      content:
+                        dailyWins.find((win) => win.id === selectedId)
+                          ?.content || "Placeholder content",
+                      delete: true,
+                    },
+                    {
+                      headers: {
+                        Authorization:
+                          localStorage.getItem("token") &&
+                          `Bearer ${localStorage.getItem("token")}`,
+                      },
+                    }
+                  );
+                  setDailyWins(
+                    dailyWins.filter((win) => win.id !== data.data.id)
+                  );
+                  setIsDeleting(false);
+                  notifications.show({
+                    message: "Win successfully deleted!",
+                    color: "teal",
+                    withCloseButton: false,
+                  });
+                } catch (error) {
+                  notifications.show({
+                    message: "Failed to delete win!",
+                    color: "red",
+                    withCloseButton: false,
+                  });
+                } finally {
+                  setIsRequesting(false);
+                }
+              };
+
+              request();
+            }}
+          >
+            Yes, proceed
+          </button>
         </div>
       </Modal>
     </div>
