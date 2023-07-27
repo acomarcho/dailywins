@@ -1,26 +1,22 @@
-import { RegisterSchema, RegisterRequest } from "@/lib/constants/requests";
-import { RegisterResponse } from "@/lib/constants/responses";
+import { LoginSchema, LoginRequest } from "@/lib/constants/requests";
+import { LoginResponse } from "@/lib/constants/responses";
 import { useState } from "react";
 import axios from "axios";
 import { notifications } from "@mantine/notifications";
 import { LoadingOverlay } from "@mantine/core";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
-export default function RegisterPage() {
-  const [request, setRequest] = useState<RegisterRequest>({
-    name: "",
+export default function LoginPage() {
+  const [request, setRequest] = useState<LoginRequest>({
     email: "",
     password: "",
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const router = useRouter();
-
   const isRequestValid = () => {
     try {
-      RegisterSchema.parse(request);
+      LoginSchema.parse(request);
       return true;
     } catch {
       return false;
@@ -34,10 +30,10 @@ export default function RegisterPage() {
       <LoadingOverlay visible={loadingFlag} overlayBlur={2} />
       <h1 className="heading relative inline-block">
         <div className="absolute bottom-0 w-full h-[1rem] bg-primary" />
-        <span className="relative">Register</span>
+        <span className="relative">Login</span>
       </h1>
       <p className="paragraph">
-        Start your journey at DailyWins by filling out the form below!
+        Continue your journey at DailyWins by filling out the form below!
       </p>
       <form
         onSubmit={(e) => {
@@ -46,27 +42,26 @@ export default function RegisterPage() {
           const onSubmit = async () => {
             try {
               setIsLoading(true);
-              await axios.post<RegisterResponse>("/api/register", {
+              const { data } = await axios.post<LoginResponse>("/api/login", {
                 ...request,
               });
+              localStorage.setItem("token", data.token);
               notifications.show({
                 withCloseButton: false,
-                message:
-                  "Successfully registered! You can now log in to your account.",
+                message: "Welcome back to Daily Wins!",
                 color: "teal",
               });
-              router.push("/login");
             } catch (error) {
               if (axios.isAxiosError(error)) {
                 notifications.show({
                   withCloseButton: false,
-                  message: `Register failed! ${error.response?.data.message}`,
+                  message: `Login failed! ${error.response?.data.message}`,
                   color: "red",
                 });
               } else {
                 notifications.show({
                   withCloseButton: false,
-                  message: `Register failed! Something went wrong.`,
+                  message: `Login failed! Something went wrong.`,
                   color: "red",
                 });
               }
@@ -79,21 +74,6 @@ export default function RegisterPage() {
         }}
         className="mt-[1rem] flex flex-col gap-[1rem]"
       >
-        <div className="flex flex-col gap-[0.25rem]">
-          <label htmlFor="name" className="paragraph font-bold">
-            Name
-          </label>
-          <input
-            type="text"
-            name="name"
-            className="px-[1rem] py-[0.5rem] drop-shadow-lg paragraph"
-            placeholder="John Doe"
-            value={request.name}
-            onChange={(e) =>
-              setRequest({ ...request, name: e.currentTarget.value })
-            }
-          />
-        </div>
         <div className="flex flex-col gap-[0.25rem]">
           <label htmlFor="email" className="paragraph font-bold">
             Email
@@ -129,12 +109,11 @@ export default function RegisterPage() {
           className="button mt-[1rem]"
           disabled={isLoading || !isRequestValid()}
         >
-          Register
+          Login
         </button>
       </form>
-      <Link href="/login" className="paragraph inline-block mt-[0.5rem]">
-        Already have an account?{" "}
-        <span className="text-primary-700">Log in</span>
+      <Link href="/register" className="paragraph inline-block mt-[0.5rem]">
+        No account yet? <span className="text-primary-700">Register</span>
       </Link>
     </div>
   );

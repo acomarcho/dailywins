@@ -15,12 +15,15 @@ export default function App({ Component, pageProps }: AppProps) {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
-      <MantineProvider withGlobalStyles withNormalizeCSS>
-        <Notifications position="top-center" />
-        <main className={`${raleway.variable} ${lato.variable}`}>
+      <main className={`${raleway.variable} ${lato.variable}`}>
+        <MantineProvider withGlobalStyles withNormalizeCSS>
+          <Notifications
+            className={`${raleway.variable} ${lato.variable}`}
+            position="top-center"
+          />
           <Component {...pageProps} />
-        </main>
-      </MantineProvider>
+        </MantineProvider>
+      </main>
     </>
   );
 }
