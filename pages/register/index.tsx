@@ -8,6 +8,15 @@ export default function RegisterPage() {
     password: "",
   });
 
+  const isRequestValid = () => {
+    try {
+      RegisterSchema.parse(request);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <div className="wrapper">
       <h1 className="heading relative inline-block">
@@ -30,6 +39,10 @@ export default function RegisterPage() {
             name="name"
             className="px-[1rem] py-[0.5rem] drop-shadow-lg paragraph"
             placeholder="John Doe"
+            value={request.name}
+            onChange={(e) =>
+              setRequest({ ...request, name: e.currentTarget.value })
+            }
           />
         </div>
         <div className="flex flex-col gap-[0.25rem]">
@@ -41,6 +54,10 @@ export default function RegisterPage() {
             name="email"
             className="px-[1rem] py-[0.5rem] drop-shadow-lg paragraph"
             placeholder="johndoe@gmail.com"
+            value={request.email}
+            onChange={(e) =>
+              setRequest({ ...request, email: e.currentTarget.value })
+            }
           />
         </div>
         <div className="flex flex-col gap-[0.25rem]">
@@ -52,9 +69,19 @@ export default function RegisterPage() {
             name="password"
             className="px-[1rem] py-[0.5rem] drop-shadow-lg paragraph"
             placeholder=""
+            value={request.password}
+            onChange={(e) =>
+              setRequest({ ...request, password: e.currentTarget.value })
+            }
           />
         </div>
-        <button type="submit" className="button">Register</button>
+        <button
+          type="submit"
+          className="button mt-[1rem]"
+          disabled={!isRequestValid()}
+        >
+          Register
+        </button>
       </form>
     </div>
   );
