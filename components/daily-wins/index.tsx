@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { LoadingOverlay } from "@mantine/core";
 import { useDailyWins } from "@/lib/hooks/useDailyWins";
+import { Modal } from "@mantine/core";
 
 export default function DailyWins() {
   const { dailyWins, isLoading, isError } = useDailyWins();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [content, setContent] = useState("");
 
   const loadingFlag = isLoading || isError;
 
@@ -34,6 +38,54 @@ export default function DailyWins() {
           </div>
         )}
       </div>
+      <div className="mt-[1rem]">
+        <button
+          className="button"
+          onClick={() => {
+            setIsModalOpen(true);
+            setContent("");
+          }}
+        >
+          Add new daily win
+        </button>
+      </div>
+      <Modal
+        opened={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        withCloseButton={false}
+        centered={true}
+      >
+        <div className="p-[1rem]">
+          <h1 className="heading">Add new win</h1>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+            className="mt-[1rem]"
+          >
+            <div className="flex flex-col gap-[0.25rem]">
+              <label htmlFor="content" className="paragraph font-bold">
+                Content <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="content"
+                className="paragraph bg-white px-[1rem] py-[0.5rem] drop-shadow-lg"
+                placeholder="I jogged for 30 minutes today!"
+                value={content}
+                onChange={(e) => {
+                  setContent(e.currentTarget.value);
+                }}
+              />
+            </div>
+            <div className="mt-[2rem]">
+              <button type="submit" className="button" disabled={!content}>
+                Add win
+              </button>
+            </div>
+          </form>
+        </div>
+      </Modal>
     </div>
   );
 }
