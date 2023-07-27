@@ -1,0 +1,3 @@
+dailywins.marchotridyo.com
+
+reverse_proxy :3000
