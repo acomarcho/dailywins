@@ -2,13 +2,17 @@ import { useState } from "react";
 import { LoadingOverlay } from "@mantine/core";
 import { useDailyWins } from "@/lib/hooks/useDailyWins";
 import { Modal } from "@mantine/core";
+import axios from "axios";
+import { notifications } from "@mantine/notifications";
+import { CreateDailyWinResponse } from "@/lib/constants/responses";
 
 export default function DailyWins() {
-  const { dailyWins, isLoading, isError } = useDailyWins();
+  const { dailyWins, setDailyWins, isLoading, isError } = useDailyWins();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [content, setContent] = useState("");
+  const [isRequesting, setIsRequesting] = useState(false);
 
-  const loadingFlag = isLoading || isError;
+  const loadingFlag = isLoading || isError || isRequesting;
 
   return (
     <div className="wrapper">
@@ -60,6 +64,43 @@ export default function DailyWins() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
+
+              const request = async () => {
+                try {
+                  setIsRequesting(true);
+                  const { data } = await axios.post<CreateDailyWinResponse>(
+                    "/api/daily-wins",
+                    {
+                      content,
+                      date: new Date().toISOString(),
+                    },
+                    {
+                      headers: {
+                        Authorization:
+                          localStorage.getItem("token") &&
+                          `Bearer ${localStorage.getItem("token")}`,
+                      },
+                    }
+                  );
+                  setDailyWins([...dailyWins, data.data]);
+                  setIsModalOpen(false);
+                  notifications.show({
+                    message: "Successfully added daily win!",
+                    withCloseButton: false,
+                    color: "teal",
+                  });
+                } catch (error) {
+                  notifications.show({
+                    message: "Failed to add daily win!",
+                    withCloseButton: false,
+                    color: "red",
+                  });
+                } finally {
+                  setIsRequesting(false);
+                }
+              };
+
+              request();
             }}
             className="mt-[1rem]"
           >
