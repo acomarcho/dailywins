@@ -38,11 +38,20 @@ export default async function handler(
 
       const prisma = new PrismaClient();
 
-      const dailyWins = await prisma.dailyWins.findMany({
-        where: {
-          userId: user.id,
-        },
-      });
+      const { date } = req.query;
+
+      const dailyWins =
+        typeof date !== "string"
+          ? await prisma.dailyWins.findMany({
+              where: {
+                userId: user.id,
+              },
+            })
+          : await prisma.dailyWins.findMany({
+              where: {
+                date: date,
+              },
+            });
 
       res.status(200).send({
         data: dailyWins.map((win) => {
@@ -86,7 +95,12 @@ export default async function handler(
       },
     });
 
-    res.status(200).json({ data: dailyWin });
+    res.status(200).json({
+      data: {
+        ...dailyWin,
+        date: dailyWin.date.toISOString(),
+      },
+    });
     try {
     } catch (error) {
       return res.status(500).json({ message: "Internal server error." });
@@ -142,7 +156,12 @@ export default async function handler(
           },
         });
 
-        return res.status(200).json({ data: dailyWin });
+        return res.status(200).json({
+          data: {
+            ...dailyWin,
+            date: dailyWin.date.toISOString(),
+          },
+        });
       } else {
         const dailyWin = await prisma.dailyWins.delete({
           where: {
@@ -150,7 +169,12 @@ export default async function handler(
           },
         });
 
-        return res.status(200).json({ data: dailyWin });
+        return res.status(200).json({
+          data: {
+            ...dailyWin,
+            date: dailyWin.date.toISOString(),
+          },
+        });
       }
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });

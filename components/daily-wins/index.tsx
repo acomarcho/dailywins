@@ -9,11 +9,10 @@ import {
   UpdateDailyWinResponse,
 } from "@/lib/constants/responses";
 import { IconX, IconEdit } from "@tabler/icons-react";
-import { DateInput } from "@mantine/dates";
+import { DatePicker } from "@mantine/dates";
 import _ from "lodash";
 
 export default function DailyWins() {
-  const { dailyWins, setDailyWins, isLoading, isError } = useDailyWins();
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -22,6 +21,7 @@ export default function DailyWins() {
   const [selectedId, setSelectedId] = useState(-1);
   const [isRequesting, setIsRequesting] = useState(false);
   const [date, setDate] = useState<Date | null>(new Date());
+  const { dailyWins, setDailyWins, isLoading, isError } = useDailyWins(date!);
 
   const loadingFlag = isLoading || isError || isRequesting;
 
@@ -46,7 +46,7 @@ export default function DailyWins() {
       >
         Change date
       </button>
-      <div className="mt-[1rem]">
+      <div className="mt-[2rem]">
         {dailyWins.length === 0 && (
           <p className="paragraph">
             {"You don't have any daily wins yet for this date. Add one now!"}
@@ -88,7 +88,7 @@ export default function DailyWins() {
           </div>
         )}
       </div>
-      <div className="mt-[2rem]">
+      <div className="mt-[0.5rem]">
         <button
           className="button"
           onClick={() => {
@@ -336,14 +336,21 @@ export default function DailyWins() {
         withCloseButton={false}
         centered={true}
       >
-        <div
-          className="p-[1rem]"
-          style={{
-            height: "80vh",
-          }}
-        >
+        <div className="p-[1rem] flex flex-col items-center">
           <h1 className="heading">Change date</h1>
-          <DateInput value={date} onChange={setDate} maxDate={new Date()} />
+          <DatePicker
+            value={date}
+            onChange={(d) => {
+              setDate(d);
+              notifications.show({
+                message: "Date successfully changed!",
+                color: "teal",
+                withCloseButton: false,
+              });
+            }}
+            maxDate={new Date()}
+            className="mt-[1rem]"
+          />
         </div>
       </Modal>
     </div>
