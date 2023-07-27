@@ -1,9 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
-import jwt from "jsonwebtoken";
 import { ErrorResponse, AuthenticateResponse } from "@/lib/constants/responses";
-import { parseToken } from "@/lib/utils";
+import { getUserFromAuthHeader } from "@/lib/api";
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,32 +13,8 @@ export default async function handler(
         return res.status(401).end();
       }
 
-      const token = parseToken(req.headers.authorization);
-
-      type User = {
-        name: string;
-        email: string;
-        password: string;
-      };
-      let decodedUser: User;
-
-      try {
-        decodedUser = (await jwt.verify(
-          token,
-          process.env.JWT_SECRET || "foo"
-        )) as User;
-      } catch {
-        return res.status(401).end();
-      }
-
-      const prisma = new PrismaClient();
-
-      const user = await prisma.user.findUnique({
-        where: {
-          email: decodedUser.email,
-        },
-      });
-      if (!user) {
+      const user = await getUserFromAuthHeader(req.headers.authorization);
+      if (!user.email) {
         return res.status(401).end();
       }
 
