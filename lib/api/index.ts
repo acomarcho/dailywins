@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../db";
 import jwt from "jsonwebtoken";
 import { parseToken } from "@/lib/utils";
 
@@ -28,8 +28,6 @@ export const getUserFromAuthHeader = async (authHeader: string) => {
     } catch {
       return noUser;
     }
-
-    const prisma = new PrismaClient();
 
     const user = await prisma.user.findUnique({
       where: {

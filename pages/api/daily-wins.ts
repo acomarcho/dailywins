@@ -14,6 +14,7 @@ import {
   UpdateDailyWinSchema,
 } from "@/lib/constants/requests";
 import { getUserFromAuthHeader } from "@/lib/api";
+import { prisma } from "@/lib/db";
 
 export default async function handler(
   req: NextApiRequest,
@@ -35,8 +36,6 @@ export default async function handler(
       if (!user.email) {
         return res.status(401).json({ message: "Invalid token." });
       }
-
-      const prisma = new PrismaClient();
 
       const { date } = req.query;
 
@@ -85,8 +84,6 @@ export default async function handler(
       return res.status(400).json({ message: "Incomplete or invalid fields." });
     }
 
-    const prisma = new PrismaClient();
-
     const dailyWin = await prisma.dailyWins.create({
       data: {
         userId: user.id,
@@ -125,8 +122,6 @@ export default async function handler(
           .status(400)
           .json({ message: "Incomplete or invalid fields." });
       }
-
-      const prisma = new PrismaClient();
 
       try {
         const dailyWin = await prisma.dailyWins.findUnique({
@@ -180,6 +175,6 @@ export default async function handler(
       res.status(500).json({ message: "Internal server error." });
     }
   } else {
-    return res.status(405).json({ message: "Method not allowed." });;
+    return res.status(405).json({ message: "Method not allowed." });
   }
 }

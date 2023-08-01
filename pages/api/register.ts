@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { ErrorResponse, RegisterResponse } from "@/lib/constants/responses";
 import { RegisterSchema, RegisterRequest } from "@/lib/constants/requests";
+import { prisma } from "@/lib/db";
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,8 +19,6 @@ export default async function handler(
           .status(400)
           .json({ message: "Incomplete or invalid fields." });
       }
-
-      const prisma = new PrismaClient();
 
       const user = await prisma.user.findUnique({
         where: {
