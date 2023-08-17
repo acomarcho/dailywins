@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 import { ErrorResponse, LoginResponse } from "@/lib/constants/responses";
 import { LoginSchema, LoginRequest } from "@/lib/constants/requests";
 import { prisma } from "@/lib/db";
+import requestIp from "request-ip";
+import { checkRateLimit } from "@/lib/api";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,6 +14,13 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
+      const ip = requestIp.getClientIp(req);
+      if (ip && !(await checkRateLimit(ip))) {
+        return res
+          .status(429)
+          .json({ message: "Rate limit exceeded. Try again in 1 minute." });
+      }
+
       let loginRequest: LoginRequest = req.body;
       try {
         LoginSchema.parse(loginRequest);

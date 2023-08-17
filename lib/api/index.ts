@@ -1,6 +1,7 @@
 import { prisma } from "../db";
 import jwt from "jsonwebtoken";
 import { parseToken } from "@/lib/utils";
+import { redis } from "../redis/redis";
 
 type User = {
   id: number;
@@ -45,4 +46,20 @@ export const getUserFromAuthHeader = async (authHeader: string) => {
   } catch {
     return noUser;
   }
+};
+
+export const checkRateLimit = async (ip: string) => {
+  const client = await redis.getClient();
+  const connections = await client.get(ip);
+  if (connections) {
+    const limit =
+      (process.env.REQUEST_LIMIT && parseInt(process.env.REQUEST_LIMIT)) || 50;
+    if (parseInt(connections) > limit) {
+      return false;
+    }
+    await client.set(ip, parseInt(connections) + 1);
+  } else {
+    await client.setEx(ip, 60, "1");
+  }
+  return true;
 };

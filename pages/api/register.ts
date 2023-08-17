@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { ErrorResponse, RegisterResponse } from "@/lib/constants/responses";
 import { RegisterSchema, RegisterRequest } from "@/lib/constants/requests";
 import { prisma } from "@/lib/db";
+import requestIp from "request-ip";
+import { checkRateLimit } from "@/lib/api";
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,6 +13,13 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
+      const ip = requestIp.getClientIp(req);
+      if (ip && !(await checkRateLimit(ip))) {
+        return res
+          .status(429)
+          .json({ message: "Rate limit exceeded. Try again in 1 minute." });
+      }
+      
       let registerRequest: RegisterRequest = req.body;
       try {
         RegisterSchema.parse(registerRequest);

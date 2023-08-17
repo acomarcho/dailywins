@@ -2,6 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ErrorResponse, AuthenticateResponse } from "@/lib/constants/responses";
 import { getUserFromAuthHeader } from "@/lib/api";
+import requestIp from "request-ip";
+import { checkRateLimit } from "@/lib/api";
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,6 +11,13 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     try {
+      const ip = requestIp.getClientIp(req);
+      if (ip && !(await checkRateLimit(ip))) {
+        return res
+          .status(429)
+          .json({ message: "Rate limit exceeded. Try again in 1 minute." });
+      }
+
       if (!req.headers.authorization) {
         return res.status(401).json({ message: "Invalid token." });
       }
