@@ -53,11 +53,11 @@ export const checkRateLimit = async (ip: string) => {
   const connections = await client.get(ip);
   if (connections) {
     const limit =
-      (process.env.REQUEST_LIMIT && parseInt(process.env.REQUEST_LIMIT)) || 50;
+      (process.env.REQUEST_LIMIT && parseInt(process.env.REQUEST_LIMIT)) || 60;
     if (parseInt(connections) > limit) {
       return false;
     }
-    await client.set(ip, parseInt(connections) + 1);
+    await client.incr(ip);
   } else {
     await client.setEx(ip, 60, "1");
   }
